@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Semáforos</title>
+    <link rel="stylesheet" href="semaforo.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Semáforos</h1>
+        
+        <div class="semaforos">
+            <div class="semaforo">
+                <h2>Semáforo 1</h2>
+                <div class="traffic-light">
+                    <div class="luz vermelho" id="sem1-vermelho"></div>
+                    <div class="luz amarelo" id="sem1-amarelo"></div>
+                    <div class="luz verde" id="sem1-verde"></div>
+                </div>
+            </div>
+
+            <div class="semaforo">
+                <h2>Semáforo 2</h2>
+                <div class="traffic-light">
+                    <div class="luz vermelho" id="sem2-vermelho"></div>
+                    <div class="luz amarelo" id="sem2-amarelo"></div>
+                    <div class="luz verde" id="sem2-verde"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="botoes">
+            <button class="btn btn-1" onclick="modo1()">
+                <span class="numero">1</span>
+                <span>Semáforo 1: Verde<br>Semáforo 2: Vermelho</span>
+            </button>
+            
+            <button class="btn btn-2" onclick="modo2()">
+                <span class="numero">2</span>
+                <span>Semáforo 1: Amarelo<br>Semáforo 2: Vermelho</span>
+            </button>
+            
+            <button class="btn btn-3" onclick="modo3()">
+                <span class="numero">3</span>
+                <span>Semáforo 1: Vermelho<br>Semáforo 2: Verde</span>
+            </button>
+            
+            <button class="btn btn-4" onclick="modo4()">
+                <span class="numero">4</span>
+                <span>Ambos em Amarelo<br>(Alerta)</span>
+            </button>
+            
+            <button class="btn btn-5" onclick="desligar()">
+                <span class="numero">5</span>
+                <span>Desligar Semáforos</span>
+            </button>
+        </div>
+    </div>
+
+    <script src="semaforo.js"></script>
+</body>
+</html>
