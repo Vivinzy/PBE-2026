@@ -1,6 +1,8 @@
 
 const logHistorico = [];
 let modoEspecial = null;
+let falhaInterval = null;
+let falhaColorIndex = 0;
 
 function atualizarLogs(mensagem) {
     const logList = document.getElementById('log-list');
@@ -11,12 +13,14 @@ function atualizarLogs(mensagem) {
 }
 
 function gerenciarCruzamento() {
-    // Simulação de Sensores [cite: 122]
     const status = {
         fluxo: Math.floor(Math.random() * 100),
         chuva: Math.random() > 0.85,
         sensorAtivo: Math.random() > 0.1
     };
+
+    // Não sobrescrever o modo especial (como falha descontrolada)
+    if (modoEspecial) return;
 
     document.getElementById('val-fluxo').innerText = `${status.fluxo}%`;
     document.getElementById('val-clima').innerText = status.chuva ? "Chuva Forte" : "Limpo";
@@ -68,7 +72,6 @@ function gerenciarCruzamento() {
 setInterval(gerenciarCruzamento, 3000);
 gerenciarCruzamento();
 
-// Funções para simular condições especiais
 function simularChuva() {
     modoEspecial = 'chuva';
     const viaA = {
@@ -141,8 +144,12 @@ function simularFalhaSensor() {
     atualizarLogs("ALERTA: Sensor offline. Modo amarelo intermitente.");
 }
 
-function resetarModo() {
-    modoEspecial = null;
+function Falhanoservidor() {
+
+    modoEspecial = 'falha';
+
+    if (falhaInterval) return;
+
     const viaA = {
         v: document.getElementById('luz-vermelha-a'),
         a: document.getElementById('luz-amarela-a'),
@@ -155,17 +162,97 @@ function resetarModo() {
     };
 
     const todasAsLuzes = [...Object.values(viaA), ...Object.values(viaB)];
-    todasAsLuzes.forEach(l => l.className = 'luz');
 
-    document.getElementById('val-clima').innerText = "Limpo";
-    document.getElementById('val-sensor').innerText = "Ativo";
-    document.getElementById('val-fluxo').innerText = "0%";
-    document.getElementById('val-modo').innerText = "Normal";
-    atualizarLogs("RETORNO: Sistema normalizado.");
+    document.getElementById('val-modo').innerText = "FALHA SERVIDOR";
+    document.getElementById('val-clima').innerText = "--";
+    document.getElementById('val-sensor').innerText = "--";
+    document.getElementById('val-fluxo').innerText = "--";
+    atualizarLogs("FALHA CRÍTICA: Servidor em modo descontrolado.");
+
+    const cores = ['vermelho', 'amarelo', 'verde'];
+    falhaColorIndex = 0;
+    todasAsLuzes.forEach(l => {
+        l.className = 'luz';
+        l.classList.add(cores[falhaColorIndex]);
+        if (cores[falhaColorIndex] === 'amarelo') l.classList.add('amarelo-piscar');
+    });
+
+    falhaInterval = setInterval(() => {
+        falhaColorIndex = (falhaColorIndex + 1) % cores.length;
+        const corAtual = cores[falhaColorIndex];
+        todasAsLuzes.forEach(l => {
+            l.className = 'luz';
+            l.classList.add(corAtual);
+            if (corAtual === 'amarelo') l.classList.add('amarelo-piscar');
+            else l.classList.remove('amarelo-piscar');
+        });
+    }, 1000);
 }
 
-// Adicionar event listeners aos botões
+function resetarSistema() {
+
+    modoEspecial = 'reset';
+
+    if (falhaInterval) {
+        clearInterval(falhaInterval);
+        falhaInterval = null;
+    }
+
+    const viaA = {
+        v: document.getElementById('luz-vermelha-a'),
+        a: document.getElementById('luz-amarela-a'),
+        g: document.getElementById('luz-verde-a')
+    };
+    const viaB = {
+        v: document.getElementById('luz-vermelha-b'),
+        a: document.getElementById('luz-amarela-b'),
+        g: document.getElementById('luz-verde-b')
+    };
+
+    const todasAsLuzes = [...Object.values(viaA), ...Object.values(viaB)];
+
+    const cores = ['verde', 'amarelo', 'vermelho'];
+    let idx = 0;
+
+    function aplicarCor(cor) {
+        todasAsLuzes.forEach(l => {
+            l.className = 'luz';
+            l.classList.add(cor);
+            if (cor === 'amarelo') l.classList.add('amarelo-piscar');
+            else l.classList.remove('amarelo-piscar');
+        });
+    }
+
+
+    document.getElementById('val-modo').innerText = "RESET";
+    document.getElementById('val-clima').innerText = "--";
+    document.getElementById('val-sensor').innerText = "--";
+    document.getElementById('val-fluxo').innerText = "--";
+    atualizarLogs("Sistema reiniciado com sucesso.");
+
+    aplicarCor(cores[0]);
+
+    setTimeout(() => {
+        aplicarCor(cores[1]);
+
+        setTimeout(() => {
+            aplicarCor(cores[2]);
+
+            setTimeout(() => {
+                modoEspecial = null;
+                document.getElementById('val-modo').innerText = "NORMAL";
+                document.getElementById('val-clima').innerText = "Limpo";
+                document.getElementById('val-sensor').innerText = "Ativo";
+                document.getElementById('val-fluxo').innerText = "0%";
+                atualizarLogs("Sequência concluída. Sistema em modo normal.");
+            }, 600);
+
+        }, 700);
+    }, 800);
+}
+
 document.getElementById('btn-chuva').addEventListener('click', simularChuva);
 document.getElementById('btn-fluxo').addEventListener('click', simularFluxoAlto);
 document.getElementById('btn-sensor').addEventListener('click', simularFalhaSensor);
-document.getElementById('btn-reset').addEventListener('click', resetarModo);
+document.getElementById('btn-reset').addEventListener('click', Falhanoservidor);
+document.getElementById('btn-resetar').addEventListener('click', resetarSistema);

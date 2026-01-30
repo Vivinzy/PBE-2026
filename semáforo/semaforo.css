@@ -75,9 +75,12 @@ header {
 .botoes-container {
     background: #1b1b1b;
     border: 2px solid #505050;
-    border-radius: 10px;
-    padding: 15px;
-    margin-top: 20px;
+    border-radius: 30px;
+    padding: 20px;
+    margin: 20px auto 0;
+    max-width: 5580px;
+    width: calc(100% - 40px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
 .botoes-container h2 {
@@ -90,18 +93,25 @@ header {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+    justify-items: center;
+}
+
+.botao-centralizado {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
 }
 
 .btn {
-    padding: 12px 15px;
+    padding: 12px 30px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 100;
     cursor: pointer;
     transition: all 0.3s ease;
     text-transform: uppercase;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .btn:hover {
@@ -128,7 +138,7 @@ header {
 }
 
 .btn-fluxo:hover {
-    background: #dd5a2f;
+    background: #a5ffc79f;
 }
 
 .btn-sensor {
@@ -140,15 +150,23 @@ header {
     background: #b71c1c;
 }
 
+.btn-queda {
+    background: #fcbeeb81;
+    color: white;
+}
+
+.btn-queda:hover {
+    background: #e9a3ff52;
+}
+
 .btn-reset {
-    background: #ffb2f281;
+    background: #000000;
     color: white;
 }
 
 .btn-reset:hover {
-    background: #ffc1f5fd;
+    background: #333333;
 }
-
 .status-panel {
     display: grid;
     grid-template-columns: 1fr 1fr;
