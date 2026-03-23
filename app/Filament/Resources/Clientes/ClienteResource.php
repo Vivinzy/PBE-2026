@@ -49,7 +49,7 @@ class ClienteResource extends Resource
         return $table->columns([
             TextColumn::make('nome')->searchable(),
             TextColumn::make('email')->searchable(),
-            textColumn::make('telefone'),
+            textColumn::make('telefone')->tel()->label('Telefone/Zap')->mask('(99) 99999-99999')
             TextColumn::make('documento'),
         ]);
     }
