@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nome');
             $table->string('referencia')->nullable(); //Ex; CAM-PRE-001
-            $table->decimal('preo_venda',10,2)->nullabl();
+            $table->decimal('preco_venda', 10, 2)->nullable();
             $table->integer('estoque')->default(0);
             $table->timestamps();
         });

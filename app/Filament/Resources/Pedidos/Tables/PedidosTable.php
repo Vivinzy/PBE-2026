@@ -36,8 +36,12 @@ class PedidosTable
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->label('Vizualizar'),
+                EditAction::make()->label('Editar'),
+                EditAction::make('entrada_estoque')
+                        ->label('Entrada')
+                        ->color('heroicon-o-plus-circle')
+                        ->color('sucess'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -14,7 +14,7 @@ class ProdutoForm
                 TextInput::make('nome')
                     ->required(),
                 TextInput::make('referencia'),
-                TextInput::make('preo_venda')
+                TextInput::make('preco_venda')
                     ->required()
                     ->numeric(),
                 TextInput::make('estoque')

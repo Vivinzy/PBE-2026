@@ -14,7 +14,7 @@ class ProdutoInfolist
                 TextEntry::make('nome'),
                 TextEntry::make('referencia')
                     ->placeholder('-'),
-                TextEntry::make('preo_venda')
+                TextEntry::make('preco_venda')
                     ->numeric(),
                 TextEntry::make('estoque')
                     ->numeric(),
