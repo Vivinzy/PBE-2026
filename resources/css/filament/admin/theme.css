@@ -1,0 +1,21 @@
+@import '/vendor/filament/filament/resources/css/app.css';
+
+:root {
+    --body-bg: #fce4ec;
+}
+
+body,
+.fi-body,
+.fi-sidebar,
+.fi-main {
+    background-color: #fce4ec !important;
+}
+
+.fi-sidebar {
+    background-color: #f8bbd0 !important;
+}
+
+.fi-topbar {
+    background-color: #f8bbd0 !important;
+    border-bottom: 1px solid #f48fb1;
+}

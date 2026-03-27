@@ -32,7 +32,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Pink,
+                'gray'    => Color::Zinc,
             ])
             ->defaultAvatarProvider(DiceBearProvider::class)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
@@ -45,11 +46,20 @@ class AdminPanelProvider extends PanelProvider
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
-->plugins([
-    DiceBearPlugin::make()
-        ->style(DiceBearStyle::Adventurer)
-        ->size(128),
-])
+            ->plugins([
+                DiceBearPlugin::make()
+                    ->style(DiceBearStyle::Adventurer)
+                    ->size(128),
+            ])
+        ->renderHook('panels::head.end', fn () => '
+    <style>
+        body, .fi-body, .fi-main { background-color: #fce4ec !important; }
+        .fi-sidebar { background-color: #f8bbd0 !important; }
+        .fi-topbar { background-color: #f8bbd0 !important; border-bottom: 1px solid #f48fb1; }
+        .fi-avatar.fi-size-lg { width: 4rem !important; height: 4rem !important; }
+        .fi-section-content .fi-avatar { width: 4rem !important; height: 4rem !important; }
+    </style>
+')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

@@ -12,15 +12,26 @@ class ProdutoForm
         return $schema
             ->components([
                 TextInput::make('nome')
-                    ->required(),
-                TextInput::make('referencia'),
+                    ->label('Nome do Produto')
+                    ->required()
+                    ->maxLength(255),
+
+                TextInput::make('referencia')
+                    ->label('Referência')
+                    ->placeholder('Ex: CAM-PRE-001')
+                    ->maxLength(100),
+
                 TextInput::make('preco_venda')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('estoque')
-                    ->required()
+                    ->label('Preço de Venda')
                     ->numeric()
-                    ->default(0),
+                    ->prefix('R$')
+                    ->minValue(0),
+
+                TextInput::make('estoque')
+                    ->label('Estoque')
+                    ->numeric()
+                    ->default(0)
+                    ->minValue(0),
             ]);
     }
 }

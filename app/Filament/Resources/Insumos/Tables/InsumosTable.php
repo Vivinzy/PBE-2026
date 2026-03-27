@@ -16,21 +16,37 @@ class InsumosTable
         return $table
             ->columns([
                 TextColumn::make('nome')
-                    ->searchable(),
+                    ->label('Nome')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('unidade_medida')
+                    ->label('Unidade')
+                    ->badge()
                     ->searchable(),
-                TextColumn::make('preço_custo')
-                    ->numeric()
-                    ->sortable(),
+
+                TextColumn::make('preco_custo')
+                    ->label('Preço de Custo')
+                    ->money('BRL')
+                    ->sortable()
+                    ->placeholder('—'),
+
                 TextColumn::make('estoque')
+                    ->label('Estoque')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->badge()
+                    ->color(fn ($state) => $state > 0 ? 'success' : 'danger'),
+
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Criado em')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Atualizado em')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nome');
             $table->string('unidade_medida');
-            $table->decimal('preço_custo',10,2)->nullable();
+            $table->decimal('preco_custo', 10, 2)->nullable();
             $table->decimal('estoque', 10,2)->default(0);
             $table->timestamps();
         });
