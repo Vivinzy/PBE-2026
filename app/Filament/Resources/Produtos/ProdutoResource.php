@@ -11,6 +11,7 @@ use App\Filament\Resources\Produtos\Schemas\ProdutoInfolist;
 use App\Filament\Resources\Produtos\Tables\ProdutosTable;
 use App\Models\Produto;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -19,6 +20,12 @@ use Filament\Tables\Table;
 class ProdutoResource extends Resource
 {
     protected static ?string $model = Produto::class;
+
+        protected static string|UnitEnum|null $navigationGroup = 'Estoque';
+
+    // 3. A ORDEM
+    //Define quem aparece primeiro. 1 é o mais alto
+    protected static ?int $navigationSort = 2;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingBag;
 

@@ -10,6 +10,7 @@ use App\Filament\Resources\Estoques\Schemas\EstoqueInfolist;
 use App\Filament\Resources\Estoques\Tables\EstoquesTable;
 use App\Models\Estoque;
 use BackedEnum;
+use UnitEnum;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,6 +22,12 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class EstoqueResource extends Resource
 {
     protected static ?string $model = Estoque::class;
+
+        protected static string|UnitEnum|null $navigationGroup = 'Estoque';
+
+    // 3. A ORDEM
+    //Define quem aparece primeiro. 1 é o mais alto
+    protected static ?int $navigationSort = 3;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
