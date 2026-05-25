@@ -2,31 +2,70 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $fillable = [
+        'rn_re',
+        'name',
+        'email',
+        'password',
+        'role',
+        'ativo',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'password'  => 'hashed',
+        'ativo'     => 'boolean',
+    ];
+
+    // Filament: define quem pode acessar o painel
+    public function canAccessPanel(Panel $panel): bool
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->ativo;
+    }
+
+    // Relacionamentos
+    public function turmas()
+    {
+        return $this->hasMany(Turma::class, 'professor_id');
+    }
+
+    public function registros()
+    {
+        return $this->hasMany(RegistroMovimento::class, 'registrado_por');
+    }
+
+    // Helpers de role
+    public function isProfessor(): bool
+    {
+        return $this->role === 'professor';
+    }
+
+    public function isCoordenacao(): bool
+    {
+        return $this->role === 'coordenacao';
+    }
+
+    public function isPortaria(): bool
+    {
+        return $this->role === 'portaria';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 }
