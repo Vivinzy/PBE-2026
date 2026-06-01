@@ -1,79 +1,73 @@
 <?php
 
-namespace App\Providers\Filament;
+namespace App\Filament\Widgets;
 
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
-use Filament\Panel;
-use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Leek\FilamentDiceBear\DiceBearPlugin;
-use Leek\FilamentDiceBear\DiceBearProvider;
-use Leek\FilamentDiceBear\Enums\DiceBearStyle;
+use App\Models\Pedido;
+use App\Models\Cliente;
+use App\Models\Produto;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\DB;
 
-class AdminPanelProvider extends PanelProvider
+class MyWidget extends BaseWidget
 {
-    public function panel(Panel $panel): Panel
+    protected static ?string $heading = 'Dashboard de Vendas';
+    protected static ?int $sort = 1;
+    
+    protected function getStats(): array
     {
-        return $panel
-            ->default()
-            ->id('admin')
-            ->path('admin')
-            ->login()
-            ->brandName('Meu Sistema')
-            ->colors([
-                'primary' => Color::Pink,
-                'gray'    => Color::Zinc,
-            ])
-            ->defaultAvatarProvider(DiceBearProvider::class)
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
-            ->pages([
-                Dashboard::class,
-            ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
-                AccountWidget::class,
-                //FilamentInfoWidget::class,
-            ])
-            ->plugins([
-                DiceBearPlugin::make()
-                    ->style(DiceBearStyle::Adventurer)
-                    ->size(128),
-            ])
-        ->renderHook('panels::head.end', fn () => '
-    <style>
-        body, .fi-body, .fi-main { background-color: #fce4ec !important; }
-        .fi-sidebar { background-color: #f8bbd0 !important; }
-        .fi-topbar { background-color: #f8bbd0 !important; border-bottom: 1px solid #f48fb1; }
-        .fi-avatar.fi-size-lg { width: 4rem !important; height: 4rem !important; }
-        .fi-section-content .fi-avatar { width: 4rem !important; height: 4rem !important; }
-    </style>
-')
-            ->middleware([
-                EncryptCookies::class,
-                AddQueuedCookiesToResponse::class,
-                StartSession::class,
-                AuthenticateSession::class,
-                ShareErrorsFromSession::class,
-                PreventRequestForgery::class,
-                SubstituteBindings::class,
-                DisableBladeIconComponents::class,
-                DispatchServingFilamentEvent::class,
-            ])
-            ->authMiddleware([
-                Authenticate::class,
-            ]);
+        // Totais
+        $totalVendas = Pedido::sum('valor_total') ?? 0;
+        $totalPedidos = Pedido::count();
+        $totalClientes = Cliente::count();
+        $totalProdutos = Produto::count();
+        
+        // Vendas do mês atual
+        $vendasMes = Pedido::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('valor_total') ?? 0;
+        
+        // Vendas do mês anterior
+        $vendasMesAnterior = Pedido::whereMonth('created_at', now()->subMonth()->month)
+            ->whereYear('created_at', now()->subMonth()->year)
+            ->sum('valor_total') ?? 0;
+        
+        // Percentual de crescimento
+        $crescimento = $vendasMesAnterior > 0 
+            ? (($vendasMes - $vendasMesAnterior) / $vendasMesAnterior) * 100 
+            : 0;
+        
+        // Pedidos por status
+        $pedidosPendentes = Pedido::where('status', 'pendente')->count();
+        $pedidosAndamento = Pedido::where('status', 'em_andamento')->count();
+        $pedidosConcluidos = Pedido::where('status', 'concluido')->count();
+        
+        return [
+            Stat::make('Total de Vendas', 'R$ ' . number_format($totalVendas, 2, ',', '.'))
+                ->description('Total geral')
+                ->descriptionIcon('heroicon-m-currency-dollar')
+                ->color('success')
+                ->chart([7, 3, 4, 5, 6, 8, 9]),
+            
+            Stat::make('Vendas este Mês', 'R$ ' . number_format($vendasMes, 2, ',', '.'))
+                ->description($crescimento >= 0 ? '+' . number_format($crescimento, 1) . '% em relação ao mês passado' : number_format($crescimento, 1) . '% em relação ao mês passado')
+                ->descriptionIcon($crescimento >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+                ->color($crescimento >= 0 ? 'success' : 'danger'),
+            
+            Stat::make('Total de Pedidos', $totalPedidos)
+                ->description($pedidosPendentes . ' pendentes | ' . $pedidosAndamento . ' em andamento | ' . $pedidosConcluidos . ' concluídos')
+                ->descriptionIcon('heroicon-m-shopping-cart')
+                ->color('primary'),
+            
+            Stat::make('Clientes Ativos', $totalClientes)
+                ->description('Clientes cadastrados')
+                ->descriptionIcon('heroicon-m-users')
+                ->color('info'),
+            
+            Stat::make('Produtos em Estoque', $totalProdutos)
+                ->description('Produtos cadastrados')
+                ->descriptionIcon('heroicon-m-cube')
+                ->color('warning'),
+        ];
     }
 }

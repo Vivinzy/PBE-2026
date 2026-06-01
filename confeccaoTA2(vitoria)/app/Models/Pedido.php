@@ -18,3 +18,4 @@ class Pedido extends Model
         return $this->hasMany(ItemPedido::class);
     }
 }
+
