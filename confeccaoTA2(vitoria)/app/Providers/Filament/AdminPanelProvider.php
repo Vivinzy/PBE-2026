@@ -1,73 +1,54 @@
 <?php
 
-namespace App\Filament\Widgets;
+namespace App\Providers\Filament;
 
-use App\Models\Pedido;
-use App\Models\Cliente;
-use App\Models\Produto;
-use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
+use Filament\Http\Middleware\Authenticate;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Pages;
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class MyWidget extends BaseWidget
+class AdminPanelProvider extends PanelProvider
 {
-    protected static ?string $heading = 'Dashboard de Vendas';
-    protected static ?int $sort = 1;
-    
-    protected function getStats(): array
+    public function panel(Panel $panel): Panel
     {
-        // Totais
-        $totalVendas = Pedido::sum('valor_total') ?? 0;
-        $totalPedidos = Pedido::count();
-        $totalClientes = Cliente::count();
-        $totalProdutos = Produto::count();
-        
-        // Vendas do mês atual
-        $vendasMes = Pedido::whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->sum('valor_total') ?? 0;
-        
-        // Vendas do mês anterior
-        $vendasMesAnterior = Pedido::whereMonth('created_at', now()->subMonth()->month)
-            ->whereYear('created_at', now()->subMonth()->year)
-            ->sum('valor_total') ?? 0;
-        
-        // Percentual de crescimento
-        $crescimento = $vendasMesAnterior > 0 
-            ? (($vendasMes - $vendasMesAnterior) / $vendasMesAnterior) * 100 
-            : 0;
-        
-        // Pedidos por status
-        $pedidosPendentes = Pedido::where('status', 'pendente')->count();
-        $pedidosAndamento = Pedido::where('status', 'em_andamento')->count();
-        $pedidosConcluidos = Pedido::where('status', 'concluido')->count();
-        
-        return [
-            Stat::make('Total de Vendas', 'R$ ' . number_format($totalVendas, 2, ',', '.'))
-                ->description('Total geral')
-                ->descriptionIcon('heroicon-m-currency-dollar')
-                ->color('success')
-                ->chart([7, 3, 4, 5, 6, 8, 9]),
-            
-            Stat::make('Vendas este Mês', 'R$ ' . number_format($vendasMes, 2, ',', '.'))
-                ->description($crescimento >= 0 ? '+' . number_format($crescimento, 1) . '% em relação ao mês passado' : number_format($crescimento, 1) . '% em relação ao mês passado')
-                ->descriptionIcon($crescimento >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
-                ->color($crescimento >= 0 ? 'success' : 'danger'),
-            
-            Stat::make('Total de Pedidos', $totalPedidos)
-                ->description($pedidosPendentes . ' pendentes | ' . $pedidosAndamento . ' em andamento | ' . $pedidosConcluidos . ' concluídos')
-                ->descriptionIcon('heroicon-m-shopping-cart')
-                ->color('primary'),
-            
-            Stat::make('Clientes Ativos', $totalClientes)
-                ->description('Clientes cadastrados')
-                ->descriptionIcon('heroicon-m-users')
-                ->color('info'),
-            
-            Stat::make('Produtos em Estoque', $totalProdutos)
-                ->description('Produtos cadastrados')
-                ->descriptionIcon('heroicon-m-cube')
-                ->color('warning'),
-        ];
+        return $panel
+            ->default()
+            ->id('admin')
+            ->path('admin')
+            ->login()
+            ->colors([
+                'primary' => Color::Amber,
+            ])
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->pages([
+                Pages\Dashboard::class,
+            ])
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->widgets([])
+            ->middleware([
+                EncryptCookies::class,
+                AddQueuedCookiesToResponse::class,
+                StartSession::class,
+                AuthenticateSession::class,
+                ShareErrorsFromSession::class,
+                VerifyCsrfToken::class,
+                SubstituteBindings::class,
+                DisableBladeIconComponents::class,
+                DispatchServingFilamentEvent::class,
+            ])
+            ->authMiddleware([
+                Authenticate::class,
+            ]);
     }
 }

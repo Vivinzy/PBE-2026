@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class SalesChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Vendas por Mês';
+    protected ?string $heading = 'Vendas por Mês';
     protected static ?int $sort = 2;
 
     protected function getData(): array
