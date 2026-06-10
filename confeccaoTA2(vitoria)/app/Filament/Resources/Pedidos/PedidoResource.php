@@ -27,13 +27,13 @@ class PedidoResource extends Resource
 {
     protected static ?string $model = Pedido::class;
 
-        protected static string|UnitEnum|null $navigationGroup = 'Vendas';
+    // navigationGroup aceita UnitEnum|string|null
+    protected static UnitEnum|string|null $navigationGroup = 'Vendas';
 
-    // 3. A ORDEM
-    //Define quem aparece primeiro. 1 é o mais alto
     protected static ?int $navigationSort = 1;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    // navigationIcon aceita BackedEnum|string|null
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'Pedido';
 
@@ -75,7 +75,6 @@ class PedidoResource extends Resource
                             ->numeric()
                             ->required()
                             ->live(onBlur: true)
-
                             ->afterStateUpdated(fn (Get $get, Set $set) =>
                             self::calcularTotal($get,$set))
                             ->columnSpan(2),
@@ -84,10 +83,8 @@ class PedidoResource extends Resource
                             ->label('Preço Unitário')
                             ->numeric()
                             ->prefix('R$')
-
                             ->required()
                             ->live(onBlur: true)
-
                             ->afterstateUpdated(fn (Get $get, Set $set) =>
                             self::calcularTotal($get, $set))
                             ->columnSpan(1),
@@ -96,11 +93,8 @@ class PedidoResource extends Resource
                     ->columnSpanFull()
                     ->label('Produtos do Pedido')
                     ->live()
-
                     ->afterStateUpdated(fn (Get $get, Set $set) =>
                             self::calcularTotal($get,$set))
-
-
         ]); 
     }
 
@@ -129,8 +123,7 @@ class PedidoResource extends Resource
                 TextColumn::make('valor_total')
                     ->label('Valor Total')
                     ->money('BRL', true)
-                    ->sortable()
-                    ->prefix('R$ '),
+                    ->sortable(),
                 
                 TextColumn::make('created_at')
                     ->label('Data do Pedido')
@@ -158,6 +151,7 @@ class PedidoResource extends Resource
             'edit' => EditPedido::route('/{record}/edit'),
         ];
     }
+    
     public static function calcularTotal(Get $get, Set $set): void
     {
         $itens = $get('itens') ?? [];

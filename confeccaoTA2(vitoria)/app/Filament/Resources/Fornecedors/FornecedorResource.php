@@ -22,32 +22,28 @@ use Filament\Tables\Columns\TextColumn;
 class FornecedorResource extends Resource
 {
     protected static ?string $model = Fornecedor::class;
-    protected static string|UnitEnum|null $navigationGroup = 'Cadastros Gerais';
+    
+    // ✅ CORRETO - usar UnitEnum|string|null
+    protected static UnitEnum|string|null $navigationGroup = 'Cadastros Gerais';
+    
     protected static ?int $navigationSort = 2;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    //Nome que vai aparecer no menu lateral
+    
+    // ✅ CORRETO - usar BackedEnum|string|null
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    
     protected static ?string $navigationLabel = 'Fornecedores';
-
-    //Nome singular (ex: usado no botão "Criar Usuario")
     protected static ?string $modelLabel = 'Fornecedor';
-
-    //Nome plural (ex: usado no título da tabela "Usuarios")
     protected static ?string $pluralModelLabel = 'Fornecedores';
-
     protected static ?string $recordTitleAttribute = 'Fornecedor';
 
     public static function form(Schema $schema): Schema
     {
-        // return FornecedorForm::configure($schema);
-        return $schema
-        ->components([
-            TextInput::make('nome')->required()->Label('Nome Completo'),
+        return $schema->components([
+            TextInput::make('nome')->required()->label('Nome Completo'),
             TextInput::make('email')->email()->label('E-mail'),
             TextInput::make('telefone')->tel()->label('Telefone/Whatsapp'),
             TextInput::make('documento')->label('CPF ou CNPJ'),
-            TextInput::make('endereço')->label('Endereço'),
+            TextInput::make('endereco')->label('Endereço'),
         ]);
     }
 
@@ -58,21 +54,18 @@ class FornecedorResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // return FornecedorsTable::configure($table);
         return $table->columns([
             TextColumn::make('nome')->searchable(),
             TextColumn::make('email')->searchable(),
-            textColumn::make('telefone'),
+            TextColumn::make('telefone'),
             TextColumn::make('documento'),
-            TextColumn::make('endereço'),
+            TextColumn::make('endereco'), // ✅ CORRIGIDO - sem acento
         ]);
     }
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
